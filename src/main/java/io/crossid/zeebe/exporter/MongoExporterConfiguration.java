@@ -6,7 +6,8 @@ import io.camunda.zeebe.protocol.record.ValueType;
 
 public class MongoExporterConfiguration {
     // mongo url
-    public String url = "http://localhost:27017";
+    //public String url = "http://localhost:27017";
+    public String url = "mongodb://admin:admin@mongodb-service:27017";
     public String dbName = "zeebe";
 
     public ColConfiguration col = new ColConfiguration();
@@ -57,6 +58,8 @@ public class MongoExporterConfiguration {
                 return col.workflowInstanceSubscription;
             case TIMER:
                 return col.timers;
+            case USER_TASK:
+                return col.userTask;
             default:
                 return false;
         }
@@ -98,6 +101,7 @@ public class MongoExporterConfiguration {
         public boolean workflowInstanceCreation = false;
         public boolean workflowInstanceSubscription = false;
         public boolean timers = true;
+        public boolean userTask = true;
         // size limits
         public int ignoreVariablesAbove = 90000000;
 

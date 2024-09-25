@@ -197,6 +197,7 @@ public class ZeebeMongoClient {
             case TIMER: return handleTimerEvent(record);
             case MESSAGE_START_EVENT_SUBSCRIPTION: return handleMessageSubscriptionStartEvent(record);
             case VARIABLE: return handleVariableEvent(record);
+            case USER_TASK: return handleUserTaskEvent(record);
 //            case JOB_BATCH: return jobReplaceCommand(record);
 //            case VARIABLE_DOCUMENT: return jobReplaceCommand(record);
 //            case WORKFLOW_INSTANCE_CREATION: return jobReplaceCommand(record);
@@ -204,6 +205,15 @@ public class ZeebeMongoClient {
 //            case WORKFLOW_INSTANCE_RESULT: return jobReplaceCommand(record);
             default: return null;
         }
+    }
+
+    private List<Tuple<String, UpdateOneModel<Document>>> handleUserTaskEvent(Record<?> record) {
+        var result = new ArrayList<Tuple<String, UpdateOneModel<Document>>>();
+        var timestamp = new Date(record.getTimestamp());
+
+        result.add(userTaskUpdateCommand(record, timestamp));
+
+        return  result;
     }
 
     private Object parseJsonValue(final String value) {
@@ -603,6 +613,25 @@ public class ZeebeMongoClient {
         )));
 
         return result;
+    }
+
+
+    private Tuple<String, UpdateOneModel<Document>> userTaskUpdateCommand(final Record<?> record, Date timestamp) {
+        var castRecord = (UserTaskRecordValue) record.getValue();
+        var document = new Document()
+                .append("action", castRecord.getAction())
+                .append("assignee", castRecord.getAssignee())
+                .append("elementId", castRecord.getElementId())
+                .append("createdAt", timestamp)
+                .append("workflowInstanceKey", castRecord.getProcessInstanceKey())
+                .append("workflowKey", castRecord.getProcessDefinitionKey());
+
+        return new Tuple<>(getCollectionName(record) , new UpdateOneModel<>(
+                new Document("_id", record.getKey()),
+                new Document("$set", document),
+                new UpdateOptions().upsert(true)
+        ));
+
     }
 
 

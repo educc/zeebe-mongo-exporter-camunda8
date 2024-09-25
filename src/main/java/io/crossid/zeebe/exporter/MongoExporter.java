@@ -1,7 +1,7 @@
 package io.crossid.zeebe.exporter;
 
 import io.crossid.zeebe.exporter.MongoExporterConfiguration.ColConfiguration;
-import  io.camunda.zeebe.exporter.api.Exporter;;
+import io.camunda.zeebe.exporter.api.Exporter;
 import io.camunda.zeebe.exporter.api.ExporterException;
 import io.camunda.zeebe.exporter.api.context.Context;
 import io.camunda.zeebe.exporter.api.context.Controller;
